@@ -73,7 +73,7 @@ jobs:
         password: ${{ secrets.AZURE_PAS }}
         port: 22
         script: |
-          ls
+          docker run -p 8080:5000 evslav/flack_calkulator
 
   TelegramNotifications_error:
     runs-on: ubuntu-latest
