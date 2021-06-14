@@ -1,0 +1,90 @@
+  
+name: CI/CD
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+  workflow_dispatch:
+
+jobs:
+  CodeStyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: pip install flake8
+      - name: Codestyle
+        run: python -m flake8 ./ --ignore=F401,E402
+  
+  Tests:
+    runs-on: ubuntu-latest
+    needs: CodeStyle
+    steps:
+      - uses: actions/checkout@v2
+      - name: tests
+        run: |
+          pip install -e '.[test]'
+          python -m coverage run -m pytest
+          python -m coverage report
+                   
+#   Deploy:
+#     runs-on: ubuntu-latest
+#     needs: Tests
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+#         with:
+#           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+#           heroku_app_name: "ksuvot-flask-calculator" # Must be unique in Heroku
+#           heroku_email: ${{secrets.HEROKU_EMAIL}}
+
+#   build:
+#     runs-on: windows-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Build
+#       run: gcc *.c -o ksuvot.exe
+#     - name: RUN
+#       run: ./ksuvot.exe
+      
+#     - uses: actions/upload-artifact@v2
+#       with:
+#         name: ksuvot-artifact
+#         path: ksuvot.exe
+#         retention-days: 1
+
+  TelegramNotifications error:
+    runs-on: ubuntu-latest
+#     needs: Deploy
+    needs: Tests
+    if: failure()
+    steps:
+      - name: Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ❌ error
+#   send:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Download
+#         uses: actions/download-artifact@v2
+#         with:
+#           name: ksuvot-artifact
+
+  TelegramNotifications done:
+    runs-on: ubuntu-latest
+#     needs: Deploy
+    needs: Tests
+    steps:
+      - name: Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ✔️ done
+#           document: ksuvot-artifact.exe
