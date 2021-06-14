@@ -27,10 +27,28 @@ jobs:
           pip install -e '.[test]'
           python -m coverage run -m pytest
           python -m coverage report
-                   
-  Deploy:
+
+ DeplloyToDockerHub:
     runs-on: ubuntu-latest
     needs: Tests
+    steps:
+        - name: Getting sources
+          uses: actions/checkout@v2
+        - name: Login to DockerHub
+          uses: docker/login-action@v1 
+          with:
+            username: ${{ secrets.DOCKER_USER }}
+            password: ${{ secrets.DOCKER_TOKEN }}
+        - name: Build
+          run: |
+            docker build -t ksuvot/final-lab .
+        - name: Push
+          run: |
+            docker push ksuvot/final-lab
+                   
+  RunOnHeroku:
+    runs-on: ubuntu-latest
+    needs: DeplloyToDockerHub
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12
@@ -39,24 +57,9 @@ jobs:
           heroku_app_name: "ksuvot-final-lab"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
 
-#   build:
-#     runs-on: windows-latest
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Build
-#       run: gcc *.c -o ksuvot.exe
-#     - name: RUN
-#       run: ./ksuvot.exe
-      
-#     - uses: actions/upload-artifact@v2
-#       with:
-#         name: ksuvot-artifact
-#         path: ksuvot.exe
-#         retention-days: 1
-
   TelegramNotifications_error:
     runs-on: ubuntu-latest
-    needs: Deploy
+    needs: RunOnHeroku
     if: failure()
     steps:
       - name: Notification
@@ -65,18 +68,10 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: ❌ error
-#   send:
-#     needs: build
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Download
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: ksuvot-artifact
 
   TelegramNotifications_done:
     runs-on: ubuntu-latest
-    needs: Deploy
+    needs: RunOnHeroku
     steps:
       - name: Notification
         uses: appleboy/telegram-action@master
@@ -84,4 +79,3 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: ✅ done
-#           document: ksuvot-artifact.exe
