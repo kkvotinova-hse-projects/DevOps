@@ -8,29 +8,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  CodeStyle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: pip install flake8
-      - name: Codestyle
-        run: python -m flake8 ./ --ignore=F401,E402
+#   CodeStyle:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Install dependencies
+#         run: pip install flake8
+#       - name: Codestyle
+#         run: python -m flake8 ./ --ignore=F401,E402
   
-  Tests:
-    runs-on: ubuntu-latest
-    needs: CodeStyle
-    steps:
-      - uses: actions/checkout@v2
-      - name: tests
-        run: |
-          pip install -e '.[test]'
-          python -m coverage run -m pytest
-          python -m coverage report
+#   Tests:
+#     runs-on: ubuntu-latest
+#     needs: CodeStyle
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: tests
+#         run: |
+#           pip install -e '.[test]'
+#           python -m coverage run -m pytest
+#           python -m coverage report
 
   DeplloyToDockerHub:
     runs-on: ubuntu-latest
-    needs: Tests
+#     needs: Tests
     steps:
         - name: Getting sources
           uses: actions/checkout@v2
@@ -45,37 +45,41 @@ jobs:
         - name: Push
           run: |
             docker push ksuvot/final-lab
+        - name: Upload
+          uses: ishworkh/docker-image-artifact-upload@v1
+          with:
+            image: "ksuvot/final-lab:latest"
                    
-  RunOnHeroku:
-    runs-on: ubuntu-latest
-    needs: DeplloyToDockerHub
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "ksuvot-final-lab"
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+#   RunOnHeroku:
+#     runs-on: ubuntu-latest
+#     needs: DeplloyToDockerHub
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: akhileshns/heroku-deploy@v3.12.12
+#         with:
+#           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+#           heroku_app_name: "ksuvot-final-lab"
+#           heroku_email: ${{secrets.HEROKU_EMAIL}}
 
-  TelegramNotifications_error:
-    runs-on: ubuntu-latest
-    needs: RunOnHeroku
-    if: failure()
-    steps:
-      - name: Notification
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ❌ error
+#   TelegramNotifications_error:
+#     runs-on: ubuntu-latest
+#     needs: RunOnHeroku
+#     if: failure()
+#     steps:
+#       - name: Notification
+#         uses: appleboy/telegram-action@master
+#         with:
+#           to: ${{ secrets.TELEGRAM_TO }}
+#           token: ${{ secrets.TELEGRAM_TOKEN }}
+#           message: ❌ error
 
-  TelegramNotifications_done:
-    runs-on: ubuntu-latest
-    needs: RunOnHeroku
-    steps:
-      - name: Notification
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ✅ done
+#   TelegramNotifications_done:
+#     runs-on: ubuntu-latest
+#     needs: RunOnHeroku
+#     steps:
+#       - name: Notification
+#         uses: appleboy/telegram-action@master
+#         with:
+#           to: ${{ secrets.TELEGRAM_TO }}
+#           token: ${{ secrets.TELEGRAM_TOKEN }}
+#           message: ✅ done
