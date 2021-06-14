@@ -28,16 +28,16 @@ jobs:
           python -m coverage run -m pytest
           python -m coverage report
                    
-#   Deploy:
-#     runs-on: ubuntu-latest
-#     needs: Tests
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
-#         with:
-#           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-#           heroku_app_name: "ksuvot-flask-calculator" # Must be unique in Heroku
-#           heroku_email: ${{secrets.HEROKU_EMAIL}}
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: Tests
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "ksuvot-flask-calculator"
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
 
 #   build:
 #     runs-on: windows-latest
@@ -56,8 +56,7 @@ jobs:
 
   TelegramNotifications_error:
     runs-on: ubuntu-latest
-#     needs: Deploy
-    needs: Tests
+    needs: Deploy
     if: failure()
     steps:
       - name: Notification
@@ -77,13 +76,12 @@ jobs:
 
   TelegramNotifications_done:
     runs-on: ubuntu-latest
-#     needs: Deploy
-    needs: Tests
+    needs: Deploy
     steps:
       - name: Notification
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ✔️ done
+          message: ✅ done
 #           document: ksuvot-artifact.exe
