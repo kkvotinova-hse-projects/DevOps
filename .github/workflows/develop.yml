@@ -74,15 +74,19 @@ jobs:
         port: 22
         script: |
           docker run -p 8080:5000 ksuvot/final-lab
-    - name: curl
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.AZURE_NAME }}
-        password: ${{ secrets.AZURE_PAS }}
-        port: 22
-        script: |
-          curl -Is http://172.17.0.2:5000/ | head -1
+      
+  Curl:    
+      runs-on: ubuntu-latest
+      steps:
+      - name: curl
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.AZURE_NAME }}
+          password: ${{ secrets.AZURE_PAS }}
+          port: 22
+          script: |
+            curl -Is http://172.17.0.2:5000/ | head -1
 # HTTP/1.0 200 OK
 
   TelegramNotifications:
