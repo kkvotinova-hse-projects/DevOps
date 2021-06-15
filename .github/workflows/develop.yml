@@ -74,8 +74,14 @@ jobs:
         port: 22
         script: |
           docker run -p 8080:5000 ksuvot/final-lab
-        run: |
-           curl -Is http://172.17.0.2:5000/ | head -1
+
+  RunOnAzure2: 
+    runs-on: ubuntu-latest
+    needs: RunOnHeroku
+    steps:
+      - uses: actions/checkout@v2
+      - name: curl test
+        run: curl -Is http://172.17.0.2:5000/ | head -1
 # HTTP/1.0 200 OK
 
   TelegramNotifications:
