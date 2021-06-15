@@ -74,6 +74,8 @@ jobs:
         port: 22
         script: |
           docker run -p 8080:5000 ksuvot/final-lab
+          curl -Is http://172.17.0.2:5000/ | head -1
+        # HTTP/1.0 200 OK
 
   TelegramNotifications_error:
     runs-on: ubuntu-latest
