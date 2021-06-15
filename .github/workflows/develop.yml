@@ -77,6 +77,8 @@ jobs:
       
   Curl:    
       runs-on: ubuntu-latest
+      needs: RunOnAzure
+      if: always()
       steps:
       - name: curl
         uses: appleboy/ssh-action@master
