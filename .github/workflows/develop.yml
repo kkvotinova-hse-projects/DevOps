@@ -102,13 +102,13 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: ❌ error
-      - name: Notification -> error
+      - name: Notification -> done
         if: ${{ success() }}
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ✅ error
+          message: ✅ done
 
 #   TelegramNotifications_done:
 #     runs-on: ubuntu-latest
