@@ -45,21 +45,17 @@ jobs:
         - name: Push
           run: |
             docker push ksuvot/final-lab
-#         - name: Upload
-#           uses: ishworkh/docker-image-artifact-upload@v1
-#           with:
-#             image: "ksuvot/final-lab:latest"
                    
-  RunOnHeroku:
-    runs-on: ubuntu-latest
-    needs: DeplloyToDockerHub
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "ksuvot-final-lab"
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+#   RunOnHeroku:
+#     runs-on: ubuntu-latest
+#     needs: DeplloyToDockerHub
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: akhileshns/heroku-deploy@v3.12.12
+#         with:
+#           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+#           heroku_app_name: "ksuvot-final-lab"
+#           heroku_email: ${{secrets.HEROKU_EMAIL}}
 
   RunOnAzure:
     runs-on: ubuntu-latest
@@ -73,7 +69,8 @@ jobs:
         password: ${{ secrets.AZURE_PAS }}
         port: 22
         script: |
-          docker run -d -p 8080:5000 ksuvot/final-lab
+          docker stop ksuvot
+          docker run --rm --name ksuvot -d -p 8080:5000 ksuvot/final-lab
 
   RunOnAzure_Test:
     runs-on: ubuntu-latest
@@ -91,7 +88,7 @@ jobs:
 
   TelegramNotifications:
     runs-on: ubuntu-latest
-    needs: RunOnHeroku
+    needs: RunOnAzure_Test
     steps:
       - name: error
         if: failure()
