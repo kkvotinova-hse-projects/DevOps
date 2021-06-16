@@ -73,7 +73,7 @@ jobs:
         password: ${{ secrets.AZURE_PAS }}
         port: 22
         script: |
-          docker run -p 8080:5000 ksuvot/final-lab
+          docker run -d -p 8080:5000 ksuvot/final-lab
 
   RunOnAzure_Test:
     runs-on: ubuntu-latest
